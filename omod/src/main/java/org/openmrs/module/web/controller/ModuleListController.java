@@ -236,8 +236,6 @@ public class ModuleListController extends SimpleFormController {
 						((OpenmrsDWRServlet) WebModuleUtil.getServlet("dwr-invoker")).reInitServlet();
 					}
 				}
-			} else {
-				ModuleUtil.checkForModuleUpdates();
 			}
 		} else if (action.equals(msa.getMessage("Module.installUpdate"))) {
 			// download and install update
@@ -246,11 +244,10 @@ public class ModuleListController extends SimpleFormController {
 				    new String[] { ModuleConstants.RUNTIMEPROPERTY_ALLOW_ADMIN });
 			}
 			Module mod = ModuleFactory.getModuleById(moduleId);
-			if (mod.getDownloadURL() != null) {
-				ModuleFactory.stopModule(mod, false, true); // stop the module with these parameters so that mandatory modules can be upgraded
+			// module download/auto-update was removed from openmrs-core (PR #6813)
+			if (mod != null) {
+				ModuleFactory.stopModule(mod, false, true);
 				WebModuleUtil.stopModule(mod, getServletContext());
-				Module newModule = ModuleFactory.updateModule(mod);
-				WebModuleUtil.startModule(newModule, getServletContext(), false);
 			}
 		} else { // moduleId is not empty
 			if (!ModuleUtil.allowAdmin()) {
